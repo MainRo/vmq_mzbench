@@ -300,9 +300,12 @@ stats({pubcomp_out, MsgId}, State) ->
 diff(MsgId, State, Metric, MetricType) ->
     T2 = os:timestamp(),
     T1 = maps:get(MsgId, State),
-    mzb_metrics:notify({Metric, MetricType}, timer:now_diff(T2, T1)),
+    mzb_metrics:notify({Metric, MetricType}, positive(timer:now_diff(T2, T1))),
     NewState = maps:remove(MsgId, State),
     NewState.
+
+positive(Val) when Val < 0 -> 0;
+positive(Val) when Val >= 0 -> Val.
 
 randlist(N) ->
     randlist(N, []).
@@ -310,5 +313,3 @@ randlist(0, Acc) ->
     Acc;
 randlist(N, Acc) ->
     randlist(N - 1, [random:uniform(26) + 96 | Acc]).
-
-
