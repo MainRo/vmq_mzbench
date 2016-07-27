@@ -232,7 +232,7 @@ stats({publish_out, MsgId, QoS}, State)  ->
 stats({publish_in, MsgId, Payload, QoS}, State) ->
     T2 = os:timestamp(),
     {T1, _OldPayload} = binary_to_term(Payload),
-    Diff = timer:now_diff(T2, T1),
+    Diff = positive(timer:now_diff(T2, T1)),
     case QoS of
         0 -> mzb_metrics:notify({"mqtt.message.pub_to_sub.latency", histogram}, Diff);
         1 -> mzb_metrics:notify({"mqtt.message.pub_to_sub.latency.qos1", histogram}, Diff);
@@ -242,7 +242,7 @@ stats({publish_in, MsgId, Payload, QoS}, State) ->
 stats({puback_in, MsgId}, State) ->
     T1 = maps:get(MsgId, State),
     T2 = os:timestamp(),
-    mzb_metrics:notify({"mqtt.publisher.qos1.puback.latency", histogram}, timer:now_diff(T2, T1)),
+    mzb_metrics:notify({"mqtt.publisher.qos1.puback.latency", histogram}, positive(timer:now_diff(T2, T1))),
     mzb_metrics:notify({"mqtt.publisher.qos1.puback.in.total", counter}, 1),
     mzb_metrics:notify({"mqtt.publisher.qos1.puback.waiting", counter}, -1),
     NewState = maps:remove(MsgId, State),
@@ -262,14 +262,14 @@ stats({unsuback, MsgId}, State) ->
 stats({pubrec_in, MsgId}, State) ->
     T2 = os:timestamp(),
     T1 = maps:get(MsgId, State),
-    mzb_metrics:notify({"mqtt.publisher.qos2.pub_out_to_pubrec_in.latency", histogram}, timer:now_diff(T2, T1)),
+    mzb_metrics:notify({"mqtt.publisher.qos2.pub_out_to_pubrec_in.latency", histogram}, positive(timer:now_diff(T2, T1))),
     mzb_metrics:notify({"mqtt.publisher.qos2.pubrec.in.total"}, 1),
     NewState = maps:update(MsgId, T2, State),
     NewState;
 stats({pubrec_out, MsgId}, State) ->
     T2 = maps:get(MsgId, State),
     T3 = os:timestamp(),
-    mzb_metrics:notify({"mqtt.consumer.qos2.publish_in_to_pubrec_out.internal_latency", histogram}, timer:now_diff(T3, T2)),
+    mzb_metrics:notify({"mqtt.consumer.qos2.publish_in_to_pubrec_out.internal_latency", histogram}, positive(timer:now_diff(T3, T2))),
     NewState = maps:update(MsgId, T3, State),
     NewState;
 stats({pubrel_out, MsgId}, State) ->
