@@ -275,25 +275,25 @@ stats({pubrec_out, MsgId}, State) ->
 stats({pubrel_out, MsgId}, State) ->
     T3 = os:timestamp(),
     T2 = maps:get(MsgId, State),
-    mzb_metrics:notify({"mqtt.publisher.qos2.pubrec_in_to_pubrel_out.internal_latency", histogram}, timer:now_diff(T3, T2)),
+    mzb_metrics:notify({"mqtt.publisher.qos2.pubrec_in_to_pubrel_out.internal_latency", histogram}, positive(timer:now_diff(T3, T2))),
     NewState = maps:update(MsgId, T3, State),
     NewState;
 stats({pubrel_in, MsgId}, State) ->
     T4 = os:timestamp(),
     T3 = maps:get(MsgId, State),
-    mzb_metrics:notify({"mqtt.consumer.qos2.pubrec_out_to_pubrel_in.latency", histogram}, timer:now_diff(T4, T3)),
+    mzb_metrics:notify({"mqtt.consumer.qos2.pubrec_out_to_pubrel_in.latency", histogram}, positive(timer:now_diff(T4, T3))),
     NewState = maps:update(MsgId, T4, State),
     NewState;
 stats({pubcomp_in, MsgId}, State) ->
     T4 = os:timestamp(),
     T3 = maps:get(MsgId, State),
-    mzb_metrics:notify({"mqtt.publisher.qos2.pubrel_out_to_pubcomp_in.latency", histogram}, timer:now_diff(T4, T3)),
+    mzb_metrics:notify({"mqtt.publisher.qos2.pubrel_out_to_pubcomp_in.latency", histogram}, positive(timer:now_diff(T4, T3))),
     NewState = maps:remove(MsgId, State),
     NewState;
 stats({pubcomp_out, MsgId}, State) ->
     T5 = os:timestamp(),
     T4 = maps:get(MsgId, State),
-    mzb_metrics:notify({"mqtt.consumer.qos2.pubrel_in_to_pubcomp_out.internal_latency", histogram}, timer:now_diff(T5, T4)),
+    mzb_metrics:notify({"mqtt.consumer.qos2.pubrel_in_to_pubcomp_out.internal_latency", histogram}, positive(timer:now_diff(T5, T4))),
     NewState = maps:remove(MsgId, State),
     NewState.
 
